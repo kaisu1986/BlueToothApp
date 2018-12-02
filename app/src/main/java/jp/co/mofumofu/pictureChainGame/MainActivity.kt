@@ -9,35 +9,21 @@ import android.content.IntentFilter
 
 class MainActivity : AppCompatActivity() {
 
-    var mManager: WifiP2pManager? = null
-    var mChannel: WifiP2pManager.Channel? = null
-    var mReceiver: BroadcastReceiver? = null
-    var mIntentFilter: IntentFilter? = null
+    private var mWifiDirectContext : WifiDirectContext? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        mManager = getSystemService(Context.WIFI_P2P_SERVICE) as WifiP2pManager
-        mChannel = mManager!!.initialize(this, mainLooper, null)
-        mReceiver = WiFiDirectBroadcastReceiver(mManager!!, mChannel!!, this)
-
-        mIntentFilter = IntentFilter()
-        mIntentFilter!!.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION)
-        mIntentFilter!!.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION)
-        mIntentFilter!!.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION)
-        mIntentFilter!!.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION)
-
         setContentView(R.layout.activity_title)
     }
 
     override fun onResume() {
         super.onResume()
-        registerReceiver(mReceiver, mIntentFilter)
+        mWifiDirectContext?.onResume(this)
     }
 
     /* unregister the broadcast receiver */
     override fun onPause() {
         super.onPause()
-        unregisterReceiver(mReceiver)
+        mWifiDirectContext?.onPause(this)
     }
 }
