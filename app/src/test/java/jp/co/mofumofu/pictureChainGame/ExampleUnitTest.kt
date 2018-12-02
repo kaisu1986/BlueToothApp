@@ -1,4 +1,4 @@
-package jp.co.mofumofu.bluetoothapp
+package jp.co.mofumofu.pictureChainGame
 
 import org.junit.Test
 

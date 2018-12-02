@@ -1,4 +1,4 @@
-package jp.co.mofumofu.bluetoothapp
+package jp.co.mofumofu.pictureChainGame
 
 import android.net.wifi.p2p.WifiP2pManager
 import android.content.Intent
@@ -26,12 +26,8 @@ class WiFiDirectBroadcastReceiver(private val mManager: WifiP2pManager, private 
             val state = intent.getIntExtra(WifiP2pManager.EXTRA_WIFI_STATE, -1)
             if (state == WifiP2pManager.WIFI_P2P_STATE_ENABLED) {
                 // Wifi P2P is enabled
-                val textView = mActivity.findViewById<TextView>(R.id.text_view1)
-                textView.setText("Wifi P2P is enabled")
             } else {
                 // Wi-Fi P2P is not enabled
-                val textView = mActivity.findViewById<TextView>(R.id.text_view1)
-                textView.setText("Wifi P2P is not enabled")
             }
         } else if (WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION == action) {
             // Call WifiP2pManager.requestPeers() to get a list of current peers

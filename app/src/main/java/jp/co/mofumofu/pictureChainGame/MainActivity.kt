@@ -1,4 +1,4 @@
-package jp.co.mofumofu.bluetoothapp
+package jp.co.mofumofu.pictureChainGame
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
@@ -6,12 +6,6 @@ import android.content.BroadcastReceiver
 import android.net.wifi.p2p.WifiP2pManager
 import android.content.Context
 import android.content.IntentFilter
-
-
-
-
-
-
 
 class MainActivity : AppCompatActivity() {
 
@@ -33,7 +27,7 @@ class MainActivity : AppCompatActivity() {
         mIntentFilter!!.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION)
         mIntentFilter!!.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION)
 
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_title)
     }
 
     override fun onResume() {
