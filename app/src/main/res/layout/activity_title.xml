@@ -18,8 +18,8 @@
             tools:layout_editor_absoluteY="8dp">
 
             <TableRow
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:layout_weight="1">
 
                 <TextView
@@ -41,25 +41,45 @@
             </TableRow>
 
             <TableRow
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
                 <TextView
                     android:id="@+id/textView"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="部屋名"
                     android:textSize="24sp"
                     android:textStyle="bold" />
 
                 <EditText
-                    android:id="@+id/editText"
-                    android:layout_width="match_parent"
+                    android:id="@+id/roomNameEditText"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:ems="10"
                     android:inputType="textPersonName"
                     android:text="みんなでなかよく" />
 
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/textView4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="名前"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/userNameEditText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:inputType="textPersonName" />
             </TableRow>
 
         </TableLayout>
@@ -73,19 +93,11 @@
                 android:layout_height="match_parent">
 
                 <Button
-                    android:id="@+id/ownerButton"
+                    android:id="@+id/playButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:onClick="onClickOwnerButton"
-                    android:text="オーナーで遊ぶ" />
-
-                <Button
-                    android:id="@+id/clientButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:onClick="onClickPlayerButton"
+                    android:onClick="onClickPlayButton"
                     android:text="プレイヤーで遊ぶ" />
             </TableRow>
         </TableLayout>
