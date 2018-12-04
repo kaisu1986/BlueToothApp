@@ -8,7 +8,6 @@ import android.content.IntentFilter
 import android.net.wifi.p2p.WifiP2pManager
 import android.net.wifi.p2p.nsd.WifiP2pDnsSdServiceInfo
 import android.net.wifi.p2p.nsd.WifiP2pDnsSdServiceRequest
-import android.util.Log
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlin.coroutines.*
@@ -34,6 +33,15 @@ class WifiDirectContext(activity : Activity) : BroadcastReceiver() {
         mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION)
         mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION)
         mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION)
+
+        mManager.clearLocalServices(mChannel, object : WifiP2pManager.ActionListener {
+            override fun onSuccess() {}
+            override fun onFailure(reason: Int) {}
+        })
+        mManager.clearServiceRequests(mChannel, object : WifiP2pManager.ActionListener {
+            override fun onSuccess() {}
+            override fun onFailure(reason: Int) {}
+        })
     }
 
     fun onResume(activity: Activity) {
@@ -78,7 +86,7 @@ class WifiDirectContext(activity : Activity) : BroadcastReceiver() {
     fun discoverPlayers(roomName: String, userName: String, successCallback: (String) -> Unit, failureCallback: (Exception) -> Unit)  {
         assert(mWifiDirectState != WifiDirectState.EnableDiscoverPlayers)
 
-        val instanceName = "mofumofuPictureChainGame_$roomName"
+        val instanceName = "mofumofuPictureChainGame"
         val serviceType = "_presence._tcp"
         val record: Map<String, String> = mapOf(
                 "listenPort" to SERVER_PORT.toString(),
@@ -86,13 +94,12 @@ class WifiDirectContext(activity : Activity) : BroadcastReceiver() {
         )
 
         // Player 情報取得するときの Listener
-        val txtListener = WifiP2pManager.DnsSdTxtRecordListener { fullDomainName, txtRecordMap, srcDevice -> Log.v("main", "hogehoge"); successCallback("test ${txtRecordMap[userName]}") }
+        val txtListener = WifiP2pManager.DnsSdTxtRecordListener { fullDomainName, txtRecordMap, srcDevice -> successCallback("test ${txtRecordMap["userName"]}") }
         val serviceListener = WifiP2pManager.DnsSdServiceResponseListener { _, _, _ -> }
 
         try  {
             GlobalScope.launch {
                 // ローカルサービスに登録
-                Log.v("main", "ローカルサービスに登録")
                 suspendCoroutine<Unit> { cont ->
                     val serviceInfo = WifiP2pDnsSdServiceInfo.newInstance(instanceName, serviceType, record)
                     mManager.addLocalService(mChannel, serviceInfo, object : WifiP2pManager.ActionListener {
@@ -109,7 +116,6 @@ class WifiDirectContext(activity : Activity) : BroadcastReceiver() {
                 // Listener 登録
                 mManager.setDnsSdResponseListeners(mChannel, serviceListener, txtListener)
 
-                Log.v("main", "Discover用 ServiceRequest を追加")
                 // Discover用 ServiceRequest を追加
                 suspendCoroutine<Unit> { cont ->
                     val serviceRequest = WifiP2pDnsSdServiceRequest.newInstance()
@@ -124,12 +130,10 @@ class WifiDirectContext(activity : Activity) : BroadcastReceiver() {
                     })
                 }
 
-                Log.v("main", "DiscoverServices を行う")
                 // DiscoverServices を行う
                 suspendCoroutine<Unit> { cont ->
                     mManager.discoverServices(mChannel, object : WifiP2pManager.ActionListener {
                         override fun onSuccess() {
-                            Log.v("main", "DiscoverServices を行う onSuccess")
                             cont.resume(Unit)
                         }
 
