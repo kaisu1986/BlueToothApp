@@ -1,14 +1,15 @@
 package jp.co.mofumofu.pictureChainGame
 
+import android.animation.ObjectAnimator
+import android.opengl.Visibility
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import android.view.animation.TranslateAnimation
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_title.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.android.synthetic.main.include_loading.view.*
+import kotlinx.coroutines.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -39,15 +40,15 @@ class MainActivity : AppCompatActivity() {
             toast.show()
         }
         else if (mWifiDirectContext.mWifiDirectState == WifiDirectContext.WifiDirectState.EnableDiscoverPlayers) {
-            val context = this
+            showLoadingLayout()
 
-            GlobalScope.launch(Dispatchers.Unconfined) {
+            GlobalScope.launch (Dispatchers.Main) {
                 val exception = mWifiDirectContext.prepareDiscoverPlayers(roomNameEditText.text.toString(), userNameEditText.text.toString())
+                hideLoadingLayout()
                 if (exception == null) {
                     setContentView(R.layout.activity_connecting)
-                }
-                else {
-                    Toast.makeText(context, "失敗です $exception.message", Toast.LENGTH_LONG).show()
+                } else {
+                    Toast.makeText(this@MainActivity, "失敗です $exception.message", Toast.LENGTH_LONG).show()
                 }
             }
         }
@@ -55,5 +56,18 @@ class MainActivity : AppCompatActivity() {
             val toast = Toast.makeText(this, mWifiDirectContext.getStateText(), Toast.LENGTH_LONG)
             toast.show()
         }
+    }
+
+    private fun showLoadingLayout() {
+        loading.visibility = View.VISIBLE
+        val anim = ObjectAnimator.ofFloat(loading.fader, "alpha", 0f, 0.2f)
+        anim.duration = 30
+        anim.start()
+    }
+
+    private fun hideLoadingLayout() {
+        val anim = ObjectAnimator.ofFloat(loading.fader, "alpha", 0.2f, 0f)
+        anim.duration = 30
+        anim.start()
     }
 }
