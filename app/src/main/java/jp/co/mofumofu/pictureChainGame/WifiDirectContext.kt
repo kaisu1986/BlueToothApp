@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.net.wifi.p2p.WifiP2pDevice
 import android.net.wifi.p2p.WifiP2pManager
 import android.net.wifi.p2p.nsd.WifiP2pDnsSdServiceInfo
 import android.net.wifi.p2p.nsd.WifiP2pDnsSdServiceRequest
@@ -19,8 +20,19 @@ class WifiDirectContext(activity : Activity) : BroadcastReceiver() {
     enum class WifiDirectState {
         Unknown,
         Disable,
+        EnablePrepareDiscoverPlayers,
         EnableDiscoverPlayers,
-        DiscoveringPlayers,
+    }
+
+    fun getStateText(): String  {
+        val stateText = when (mWifiDirectState) {
+            WifiDirectState.Unknown -> "Unknown 状態です"
+            WifiDirectState.Disable -> "Wifi P2P が有効ではありません。"
+            WifiDirectState.EnablePrepareDiscoverPlayers -> "prepareDiscoverPlayers() 中です。"
+            WifiDirectState.EnableDiscoverPlayers -> "discoverPlayers() が呼べる状態です。"
+        }
+
+        return stateText + " (" + mWifiDirectState.toString() + ")"
     }
 
     private var mManager = activity.getSystemService(Context.WIFI_P2P_SERVICE) as WifiP2pManager
@@ -35,10 +47,6 @@ class WifiDirectContext(activity : Activity) : BroadcastReceiver() {
         mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION)
 
         mManager.clearLocalServices(mChannel, object : WifiP2pManager.ActionListener {
-            override fun onSuccess() {}
-            override fun onFailure(reason: Int) {}
-        })
-        mManager.clearServiceRequests(mChannel, object : WifiP2pManager.ActionListener {
             override fun onSuccess() {}
             override fun onFailure(reason: Int) {}
         })
@@ -72,81 +80,81 @@ class WifiDirectContext(activity : Activity) : BroadcastReceiver() {
         }
     }
 
-    fun getStateText(): String  {
-        val stateText = when (mWifiDirectState) {
-            WifiDirectState.Unknown -> "Unknown 状態です"
-            WifiDirectState.Disable -> "Wifi P2P が有効ではありません。"
-            WifiDirectState.EnableDiscoverPlayers -> "DiscoverPlayers() が呼べる状態です。"
-            WifiDirectState.DiscoveringPlayers -> "DiscoverPlayers() 中です。"
-        }
-
-        return stateText + " (" + mWifiDirectState.toString() + ")"
-    }
-
-    fun discoverPlayers(roomName: String, userName: String, successCallback: (String) -> Unit, failureCallback: (Exception) -> Unit)  {
+    suspend fun prepareDiscoverPlayers(roomName: String, userName: String) : Exception? {
         assert(mWifiDirectState != WifiDirectState.EnableDiscoverPlayers)
 
         val instanceName = "mofumofuPictureChainGame"
         val serviceType = "_presence._tcp"
         val record: Map<String, String> = mapOf(
                 "listenPort" to SERVER_PORT.toString(),
+                "roomName" to roomName,
                 "userName" to userName
         )
 
         // Player 情報取得するときの Listener
-        val txtListener = WifiP2pManager.DnsSdTxtRecordListener { fullDomainName, txtRecordMap, srcDevice -> successCallback("test ${txtRecordMap["userName"]}") }
+        val txtListener = WifiP2pManager.DnsSdTxtRecordListener { fullDomainName, txtRecordMap, srcDevice -> addPlayers(fullDomainName, txtRecordMap, srcDevice) }
         val serviceListener = WifiP2pManager.DnsSdServiceResponseListener { _, _, _ -> }
 
+        // Listener 登録
+        mManager.setDnsSdResponseListeners(mChannel, serviceListener, txtListener)
+
         try  {
-            GlobalScope.launch {
-                // ローカルサービスに登録
-                suspendCoroutine<Unit> { cont ->
-                    val serviceInfo = WifiP2pDnsSdServiceInfo.newInstance(instanceName, serviceType, record)
-                    mManager.addLocalService(mChannel, serviceInfo, object : WifiP2pManager.ActionListener {
-                        override fun onSuccess() {
-                            cont.resume(Unit)
-                        }
-
-                        override fun onFailure(reason: Int) {
-                            cont.resumeWithException(Exception("failed addLocalService() $reason"))
-                        }
-                    })
-                }
-
-                // Listener 登録
-                mManager.setDnsSdResponseListeners(mChannel, serviceListener, txtListener)
-
-                // Discover用 ServiceRequest を追加
-                suspendCoroutine<Unit> { cont ->
-                    val serviceRequest = WifiP2pDnsSdServiceRequest.newInstance()
-                    mManager.addServiceRequest(mChannel, serviceRequest, object : WifiP2pManager.ActionListener {
-                        override fun onSuccess() {
-                            cont.resume(Unit)
-                        }
-
-                        override fun onFailure(reason: Int) {
-                            cont.resumeWithException(Exception("failed addServiceRequest() $reason"))
-                        }
-                    })
-                }
-
-                // DiscoverServices を行う
-                suspendCoroutine<Unit> { cont ->
-                    mManager.discoverServices(mChannel, object : WifiP2pManager.ActionListener {
-                        override fun onSuccess() {
-                            cont.resume(Unit)
-                        }
-
-                        override fun onFailure(reason: Int) {
-                            cont.resumeWithException(Exception("failed addServiceRequest() $reason"))
-                        }
-                    })
-                }
+            // ローカルサービスを一旦削除
+            suspendCoroutine<Unit> { cont ->
+                mManager.clearLocalServices(mChannel, object : WifiP2pManager.ActionListener {
+                    override fun onSuccess() { cont.resume(Unit) }
+                    override fun onFailure(reason: Int) { cont.resumeWithException(Exception("failed clearLocalService() $reason")) }
+                })
             }
+
+            // ローカルサービスに登録
+            suspendCoroutine<Unit> { cont ->
+                val serviceInfo = WifiP2pDnsSdServiceInfo.newInstance(instanceName, serviceType, record)
+                mManager.addLocalService(mChannel, serviceInfo, object : WifiP2pManager.ActionListener {
+                    override fun onSuccess() { cont.resume(Unit) }
+                    override fun onFailure(reason: Int) { cont.resumeWithException(Exception("failed addLocalService() $reason")) }
+                })
+            }
+
+            // Discover用 ServiceRequest を追加
+            suspendCoroutine<Unit> { cont ->
+                val serviceRequest = WifiP2pDnsSdServiceRequest.newInstance()
+                mManager.addServiceRequest(mChannel, serviceRequest, object : WifiP2pManager.ActionListener {
+                    override fun onSuccess() { cont.resume(Unit) }
+                    override fun onFailure(reason: Int) { cont.resumeWithException(Exception("failed addServiceRequest() $reason")) }
+                })
+            }
+
+            mWifiDirectState = WifiDirectState.EnableDiscoverPlayers
         }
         catch (e: Exception) {
-            failureCallback(e)
+            return e
         }
+
+        return null
+    }
+
+    suspend fun discoverPlayers() : Exception? {
+        assert(mWifiDirectState != WifiDirectState.EnableDiscoverPlayers)
+
+        try {
+            // DiscoverServices を行う
+            suspendCoroutine<Unit> { cont ->
+                mManager.discoverServices(mChannel, object : WifiP2pManager.ActionListener {
+                    override fun onSuccess() { cont.resume(Unit) }
+                    override fun onFailure(reason: Int) { cont.resumeWithException(Exception("failed addServiceRequest() $reason")) }
+                })
+            }
+        }
+        catch (e : Exception) {
+            return e
+        }
+
+        return null
+    }
+
+    private fun addPlayers(fullDomainName : String, txtRecordMap : Map<String, String>, srcDevice : WifiP2pDevice) {
+
     }
 
     /*

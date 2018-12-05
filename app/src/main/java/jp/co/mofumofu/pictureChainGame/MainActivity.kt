@@ -1,10 +1,15 @@
 package jp.co.mofumofu.pictureChainGame
 
+import android.app.ProgressDialog
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import android.widget.ProgressBar
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_title.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
@@ -33,9 +38,17 @@ class MainActivity : AppCompatActivity() {
             toast.show()
         }
         else if (mWifiDirectContext.mWifiDirectState == WifiDirectContext.WifiDirectState.EnableDiscoverPlayers) {
-            val successCallback = { message: String-> Toast.makeText(this, "成功です $message", Toast.LENGTH_LONG).show() }
-            val failureCallback =  { exception: Exception ->Toast.makeText(this, "失敗です $exception.message", Toast.LENGTH_LONG).show() }
-            mWifiDirectContext.discoverPlayers(roomNameEditText.text.toString(), userNameEditText.text.toString(), successCallback, failureCallback)
+            val context = this
+
+            GlobalScope.launch(Dispatchers.Unconfined) {
+                val exception = mWifiDirectContext.prepareDiscoverPlayers(roomNameEditText.text.toString(), userNameEditText.text.toString())
+                if (exception == null) {
+                    setContentView(R.layout.activity_connecting)
+                }
+                else {
+                    Toast.makeText(context, "失敗です $exception.message", Toast.LENGTH_LONG).show()
+                }
+            }
         }
         else {
             val toast = Toast.makeText(this, mWifiDirectContext.getStateText(), Toast.LENGTH_LONG)
