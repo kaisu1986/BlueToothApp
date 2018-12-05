@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
+<android.widget.FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
+    <include layout="@layout/include_loading"/>
 
     <TableLayout
         android:layout_width="match_parent"
@@ -20,7 +21,7 @@
                 android:id="@+id/ConnectingTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="接続中です。"
+                android:text="@string/Connecting"
                 android:textSize="24sp" />
         </TableRow>
 
@@ -49,20 +50,20 @@
             android:orientation="vertical">
 
             <Button
-                android:id="@+id/playButton"
+                android:id="@+id/connectPlayButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="上記プレイヤーと遊ぶ" />
+                android:text="@string/ConnectPlayButton" />
 
             <Button
-                android:id="@+id/cancelButton"
+                android:id="@+id/connectCancelButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="キャンセル" />
+                android:text="@string/ConnectCancelButton" />
 
         </TableRow>
     </TableLayout>
 
-</android.support.constraint.ConstraintLayout>
+</android.widget.FrameLayout>

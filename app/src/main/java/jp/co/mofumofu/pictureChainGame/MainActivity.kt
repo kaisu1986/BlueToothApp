@@ -1,13 +1,12 @@
 package jp.co.mofumofu.pictureChainGame
 
-import android.app.ProgressDialog
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
-import android.widget.ProgressBar
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_title.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
@@ -32,6 +31,8 @@ class MainActivity : AppCompatActivity() {
         mWifiDirectContext.onPause(this)
     }
 
+    @Suppress("UNUSED_PARAMETER")
+    @ExperimentalCoroutinesApi
     fun onClickPlayButton(view : View) {
         if (userNameEditText.text.toString() == "") {
             val toast = Toast.makeText(this, "名前を入力してください", Toast.LENGTH_LONG)

@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">絵しりとり</string>
+    <string name="ExplainMessage">絵しりとりをしたい人同士で共通の部屋名を入れて、１人は「オーナー」として、他の方は「プレイヤー」のボタンを押してください。</string>
+    <string name="ExplainTitle">説明</string>
+    <string name="RoomName">部屋名</string>
+    <string name="RoomNameDefault">みんなでなかよく</string>
+    <string name="Name">名前</string>
+    <string name="PlayButton">プレイヤーで遊ぶ</string>
+    <string name="Connecting">接続中です。</string>
+    <string name="ConnectPlayButton">上記プレイヤーと遊ぶ</string>
+    <string name="ConnectCancelButton">キャンセル</string>
+    <string name="RoomNameHint">ルーム名を入力してください。</string>
+    <string name="UserNameHint">プレイヤー名を入力してください。</string>
 </resources>

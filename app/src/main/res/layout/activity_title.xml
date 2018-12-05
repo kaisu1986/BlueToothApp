@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<android.widget.FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
+
+    <include layout="@layout/include_loading" android:id="@+id/loading"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -13,7 +14,7 @@
 
         <TableLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:layout_weight="1"
             tools:layout_editor_absoluteY="8dp">
 
@@ -26,7 +27,7 @@
                     android:id="@+id/textView2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="説明"
+                    android:text="@string/ExplainTitle"
                     android:textSize="24sp"
                     android:textStyle="bold" />
 
@@ -35,7 +36,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="絵しりとりをしたい人同士で共通の部屋名を入れて、１人は「オーナー」として、他の方は「プレイヤー」のボタンを押してください。"
+                    android:text="@string/ExplainMessage"
                     android:textSize="18sp" />
 
             </TableRow>
@@ -48,7 +49,7 @@
                     android:id="@+id/textView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="部屋名"
+                    android:text="@string/RoomName"
                     android:textSize="24sp"
                     android:textStyle="bold" />
 
@@ -58,7 +59,8 @@
                     android:layout_height="wrap_content"
                     android:ems="10"
                     android:inputType="textPersonName"
-                    android:text="みんなでなかよく" />
+                    android:text="@string/RoomNameDefault"
+                    android:hint="@string/RoomNameHint" />
 
             </TableRow>
 
@@ -70,7 +72,7 @@
                     android:id="@+id/textView4"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="名前"
+                    android:text="@string/Name"
                     android:textSize="24sp"
                     android:textStyle="bold" />
 
@@ -79,7 +81,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:ems="10"
-                    android:inputType="textPersonName" />
+                    android:inputType="textPersonName"
+                    android:hint="@string/UserNameHint"/>
             </TableRow>
 
         </TableLayout>
@@ -98,9 +101,9 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:onClick="onClickPlayButton"
-                    android:text="プレイヤーで遊ぶ" />
+                    android:text="@string/PlayButton" />
             </TableRow>
         </TableLayout>
     </LinearLayout>
 
-</android.support.constraint.ConstraintLayout>
+</android.widget.FrameLayout>
