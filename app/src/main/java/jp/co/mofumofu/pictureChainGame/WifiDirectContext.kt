@@ -9,6 +9,9 @@ import android.net.wifi.p2p.WifiP2pDevice
 import android.net.wifi.p2p.WifiP2pManager
 import android.net.wifi.p2p.nsd.WifiP2pDnsSdServiceInfo
 import android.net.wifi.p2p.nsd.WifiP2pDnsSdServiceRequest
+import android.widget.Toast
+import kotlinx.coroutines.*
+import java.util.concurrent.Executors
 import kotlin.coroutines.*
 
 const val SERVER_PORT = 8888
@@ -36,6 +39,7 @@ class WifiDirectContext(activity : Activity) : BroadcastReceiver() {
     private var mManager = activity.getSystemService(Context.WIFI_P2P_SERVICE) as WifiP2pManager
     private var mChannel = mManager.initialize(activity, activity.mainLooper, null)
     private var mIntentFilter = IntentFilter()
+    private var mDiscoverPlayersCoroutineContext = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
     var mWifiDirectState = WifiDirectState.Unknown
 
     init {
@@ -132,7 +136,18 @@ class WifiDirectContext(activity : Activity) : BroadcastReceiver() {
         return null
     }
 
-    suspend fun discoverPlayers() : Exception? {
+    fun startDiscoverPlayersDaemon(context: Context) {
+        GlobalScope.launch(mDiscoverPlayersCoroutineContext) {
+            while (true) {
+                Thread.sleep(3000)
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(context, "てすと", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    private suspend fun discoverPlayers() : Exception? {
         assert(mWifiDirectState != WifiDirectState.EnableDiscoverPlayers)
 
         try {

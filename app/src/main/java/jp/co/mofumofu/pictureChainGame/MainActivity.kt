@@ -50,6 +50,7 @@ class MainActivity : AppCompatActivity() {
                     hideLoadingLayout()
                     if (exception == null) {
                         setContentView(R.layout.activity_connecting)
+                        mWifiDirectContext.startDiscoverPlayersDaemon(this@MainActivity)
                     } else {
                         Toast.makeText(this@MainActivity, "失敗です $exception.message", Toast.LENGTH_LONG).show()
                     }
