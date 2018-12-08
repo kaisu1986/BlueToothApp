@@ -45,7 +45,6 @@ class MainActivity : AppCompatActivity() {
             showLoadingLayout()
 
             GlobalScope.launch (Dispatchers.IO) {
-                Thread.sleep(10000)
                 val exception = mWifiDirectContext.prepareDiscoverPlayers(roomNameEditText.text.toString(), userNameEditText.text.toString())
                 withContext(Dispatchers.Main) {
                     hideLoadingLayout()
@@ -69,9 +68,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         val rootViewGroup = this.findViewById<View>(android.R.id.content) as ViewGroup
-        setRecursiveEnableControls(rootViewGroup, false);
-
         mLoadingView = layoutInflater.inflate(R.layout.include_loading, rootViewGroup)
+
         val anim = ObjectAnimator.ofFloat(mLoadingView!!.fader, "alpha", 0f, 0.2f)
         anim.duration = 30
         anim.start()
@@ -81,15 +79,5 @@ class MainActivity : AppCompatActivity() {
         val anim = ObjectAnimator.ofFloat(mLoadingView!!.fader, "alpha", 0.2f, 0f)
         anim.duration = 30
         anim.start()
-    }
-
-    private fun setRecursiveEnableControls(vg: ViewGroup, enable: Boolean) {
-        for (i in 0 until vg.childCount) {
-            val child = vg.getChildAt(i)
-            child.isEnabled = enable
-            if (child is ViewGroup) {
-                setRecursiveEnableControls(child, enable)
-            }
-        }
     }
 }
