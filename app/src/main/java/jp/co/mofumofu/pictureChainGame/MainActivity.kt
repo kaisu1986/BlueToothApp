@@ -1,21 +1,20 @@
 package jp.co.mofumofu.pictureChainGame
 
 import android.animation.ObjectAnimator
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
 import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_title.*
 import kotlinx.android.synthetic.main.include_loading.view.*
 import kotlinx.coroutines.*
-import android.view.ViewGroup
-
 
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var mWifiDirectContext : WifiDirectContext
-    private var mLoadingView : View? = null
+    private lateinit var mWifiDirectContext: WifiDirectContext
+    private var mLoadingView: View? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,15 +35,14 @@ class MainActivity : AppCompatActivity() {
 
     @Suppress("UNUSED_PARAMETER")
     @ExperimentalCoroutinesApi
-    fun onClickPlayButton(view : View) {
+    fun onClickPlayButton(view: View) {
         if (userNameEditText.text.toString() == "") {
             val toast = Toast.makeText(this, "名前を入力してください", Toast.LENGTH_LONG)
             toast.show()
-        }
-        else if (mWifiDirectContext.mWifiDirectState == WifiDirectContext.WifiDirectState.EnableDiscoverPlayers) {
+        } else if (mWifiDirectContext.mWifiDirectState == WifiDirectContext.WifiDirectState.EnableDiscoverPlayers) {
             showLoadingLayout()
 
-            GlobalScope.launch (Dispatchers.IO) {
+            GlobalScope.launch(Dispatchers.IO) {
                 val exception = mWifiDirectContext.prepareDiscoverPlayers(roomNameEditText.text.toString(), userNameEditText.text.toString())
                 withContext(Dispatchers.Main) {
                     hideLoadingLayout()
@@ -56,8 +54,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
-        }
-        else {
+        } else {
             val toast = Toast.makeText(this, mWifiDirectContext.getStateText(), Toast.LENGTH_LONG)
             toast.show()
         }
