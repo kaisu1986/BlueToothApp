@@ -19,6 +19,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getTargetContext()
-        assertEquals("jp.co.mofumofu.bluetoothapp", appContext.packageName)
+        assertEquals("jp.co.mofumofu.pictureChainGame", appContext.packageName)
     }
 }

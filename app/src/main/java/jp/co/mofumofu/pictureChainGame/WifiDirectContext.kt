@@ -169,21 +169,4 @@ class WifiDirectContext(activity : Activity) : BroadcastReceiver() {
     private fun addPlayers(fullDomainName : String, txtRecordMap : Map<String, String>, srcDevice : WifiP2pDevice) {
 
     }
-
-    /*
-    fun sendMessage()
-    {
-        var serverSocket = ServerSocket(8888)
-        var client = serverSocket.accept();
-        var outputStream = client.getOutputStream()
-        outputStream.write("test".toByteArray())
-    }
-
-    fun recvMessage()
-    {
-        var socket = Socket()
-        socket.bind(null)
-        socket.connect(InetSocketAddress(host, port))
-    }
-    */
 }
