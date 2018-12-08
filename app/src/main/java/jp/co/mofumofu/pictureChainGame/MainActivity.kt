@@ -1,19 +1,21 @@
 package jp.co.mofumofu.pictureChainGame
 
 import android.animation.ObjectAnimator
-import android.opengl.Visibility
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
-import android.view.animation.TranslateAnimation
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_title.*
 import kotlinx.android.synthetic.main.include_loading.view.*
 import kotlinx.coroutines.*
+import android.view.ViewGroup
+
+
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var mWifiDirectContext : WifiDirectContext
+    private var mLoadingView : View? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,13 +44,16 @@ class MainActivity : AppCompatActivity() {
         else if (mWifiDirectContext.mWifiDirectState == WifiDirectContext.WifiDirectState.EnableDiscoverPlayers) {
             showLoadingLayout()
 
-            GlobalScope.launch (Dispatchers.Main) {
+            GlobalScope.launch (Dispatchers.IO) {
+                Thread.sleep(10000)
                 val exception = mWifiDirectContext.prepareDiscoverPlayers(roomNameEditText.text.toString(), userNameEditText.text.toString())
-                hideLoadingLayout()
-                if (exception == null) {
-                    setContentView(R.layout.activity_connecting)
-                } else {
-                    Toast.makeText(this@MainActivity, "失敗です $exception.message", Toast.LENGTH_LONG).show()
+                withContext(Dispatchers.Main) {
+                    hideLoadingLayout()
+                    if (exception == null) {
+                        setContentView(R.layout.activity_connecting)
+                    } else {
+                        Toast.makeText(this@MainActivity, "失敗です $exception.message", Toast.LENGTH_LONG).show()
+                    }
                 }
             }
         }
@@ -59,15 +64,32 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showLoadingLayout() {
-        loading.visibility = View.VISIBLE
-        val anim = ObjectAnimator.ofFloat(loading.fader, "alpha", 0f, 0.2f)
+        if (mLoadingView != null) {
+            return
+        }
+
+        val rootViewGroup = this.findViewById<View>(android.R.id.content) as ViewGroup
+        setRecursiveEnableControls(rootViewGroup, false);
+
+        mLoadingView = layoutInflater.inflate(R.layout.include_loading, rootViewGroup)
+        val anim = ObjectAnimator.ofFloat(mLoadingView!!.fader, "alpha", 0f, 0.2f)
         anim.duration = 30
         anim.start()
     }
 
     private fun hideLoadingLayout() {
-        val anim = ObjectAnimator.ofFloat(loading.fader, "alpha", 0.2f, 0f)
+        val anim = ObjectAnimator.ofFloat(mLoadingView!!.fader, "alpha", 0.2f, 0f)
         anim.duration = 30
         anim.start()
+    }
+
+    private fun setRecursiveEnableControls(vg: ViewGroup, enable: Boolean) {
+        for (i in 0 until vg.childCount) {
+            val child = vg.getChildAt(i)
+            child.isEnabled = enable
+            if (child is ViewGroup) {
+                setRecursiveEnableControls(child, enable)
+            }
+        }
     }
 }
