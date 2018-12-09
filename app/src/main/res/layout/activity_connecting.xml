@@ -16,7 +16,7 @@
             android:layout_weight="0">
 
             <TextView
-                android:id="@+id/ConnectingTextView"
+                android:id="@+id/connectingTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/Connecting"
@@ -29,6 +29,7 @@
             android:layout_weight="1">
 
             <android.support.v7.widget.RecyclerView
+                android:id="@+id/connectPlayerInfoRecyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"

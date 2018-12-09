@@ -3,9 +3,11 @@ package jp.co.mofumofu.pictureChainGame
 import android.animation.ObjectAnimator
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.LinearLayoutManager
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import kotlinx.android.synthetic.main.activity_connecting.*
 import kotlinx.android.synthetic.main.activity_title.*
 import kotlinx.android.synthetic.main.include_loading.view.*
 import kotlinx.coroutines.*
@@ -48,7 +50,14 @@ class MainActivity : AppCompatActivity() {
                     hideLoadingLayout()
                     if (exception == null) {
                         setContentView(R.layout.activity_connecting)
-                        mWifiDirectContext.startDiscoverPlayersDaemon(this@MainActivity)
+                        connectPlayerInfoRecyclerView.setHasFixedSize(true)
+                        connectPlayerInfoRecyclerView.layoutManager = LinearLayoutManager(this@MainActivity)
+                        connectPlayerInfoRecyclerView.adapter = ConnectPlayerInfoRecycleViewAdapter()
+                        mWifiDirectContext.setDiscoverPlayerListener { list ->
+                            val adapter = connectPlayerInfoRecyclerView.adapter as ConnectPlayerInfoRecycleViewAdapter
+                            adapter.update(list)
+                        }
+                        mWifiDirectContext.startDiscoverPlayersDaemon()
                     } else {
                         Toast.makeText(this@MainActivity, "失敗です $exception.message", Toast.LENGTH_LONG).show()
                     }
